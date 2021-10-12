@@ -1,5 +1,5 @@
 *.zip
 *.docx
 *.pdf
-*.txt
+*log.txt
 *backup*.py
