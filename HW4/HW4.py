@@ -31,7 +31,8 @@ def dilationImg(img, origin, kernel):
                     for n in range(kernel_w):
                         if kernel[m][n] == 1:
                             ret[i+m][j+n] = 255
-    cv2.imwrite("./HW4/dilation.bmp", ret)
+    return ret
+    # cv2.imwrite("./HW4/dilation.bmp", ret)
             
 def erosionImg(img, origin, kernel):
     img = BinarizeImageAt128(img)
@@ -48,8 +49,8 @@ def erosionImg(img, origin, kernel):
                     ret[i+origin[1]][j+origin[0]] = 255
                 else:
                     ret[i+origin[1]][j+origin[0]] = 0
-
-    cv2.imwrite("./HW4/erosion.bmp", ret)
+    return ret
+    # cv2.imwrite("./HW4/erosion.bmp", ret)
 
 
 if __name__ == "__main__":
@@ -66,8 +67,10 @@ if __name__ == "__main__":
         [0,1]
     ]
 
-    # img = cv2.imread("./HW4/lena.bmp", cv2.IMREAD_GRAYSCALE)
-    # dilationImg(img, (2,2), octogon)
+    img = cv2.imread("./HW4/lena.bmp", cv2.IMREAD_GRAYSCALE)
+    img = dilationImg(img, (2,2), octogon)
+    cv2.imwrite("./HW4/dilation.bmp", img)
 
     img = cv2.imread("./HW4/lena.bmp", cv2.IMREAD_GRAYSCALE)
-    erosionImg(img, (2,2), octogon)
+    img = erosionImg(img, (2,2), octogon)
+    cv2.imwrite("./HW4/erosion.bmp", img)
