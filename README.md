@@ -21,3 +21,18 @@
     - (a) original image and its histogram
     - (b) image with intensity divided by 3 and its histogram
     - (c) image after applying histogram equalization to (b) and its histogram
+
+## HW4
+- Write programs which do binary morphology on a binary image:
+    - (a) Dilation
+    - (b) Erosion
+    - (c) Opening
+    - (d) Closing
+    - (e) Hit-and-miss transform
+
+## HW5
+- Write programs which do gray-scale morphology on a gray-scale image(lena.bmp):
+    - (a) Dilation
+    - (b) Erosion
+    - (c) Opening
+    - (d) Closing
