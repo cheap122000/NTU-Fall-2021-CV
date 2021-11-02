@@ -64,4 +64,5 @@ if __name__ == "__main__":
     img = cv2.imread("./HW6/lena.bmp", cv2.IMREAD_GRAYSCALE)
     img = BinarizeImageAt128(img)
     img = resizeWith8x8(img)
+    cv2.imwrite('./HW6/resizeWith8x8.bmp', img)
     img = YokoConnectivityNumber(img)
