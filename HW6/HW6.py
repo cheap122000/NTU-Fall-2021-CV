@@ -27,7 +27,7 @@ def func_h(b, c, d, e):
         return 'r'
     return 's'
 
-def YokoConnectivityNumber(img):
+def YokoiConnectivityNumber(img):
     h, w = img.shape
     ret = np.zeros((h, w), np.uint8)
     for i in range(h):
@@ -65,4 +65,4 @@ if __name__ == "__main__":
     img = BinarizeImageAt128(img)
     img = resizeWith8x8(img)
     cv2.imwrite('./HW6/resizeWith8x8.bmp', img)
-    img = YokoConnectivityNumber(img)
+    img = YokoiConnectivityNumber(img)
