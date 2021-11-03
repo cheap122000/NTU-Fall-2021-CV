@@ -39,3 +39,6 @@
 
 ## HW6
 - Write a program which counts the Yokoi connectivity number on a downsampled image(lena.bmp).
+
+## HW7
+- Write a program which does thinning on a downsampled image (lena.bmp).
