@@ -45,8 +45,6 @@ class EdgeDetector():
                         ret[h+half][w+half] = img[i][j]
             return ret
 
-
-    
     def get_magnitude(self, i ,j):
         temp_matrix = self.get_extend_matrix(i, j)
         temp = 0
@@ -262,6 +260,7 @@ class NevatiaBabu5x5Operator(EdgeDetector):
                 [-100, -100, -100, -100, -100]
             ],
         ])
+
 
 if __name__ == "__main__":
     img = cv2.imread("./HW9/lena.bmp", cv2.IMREAD_GRAYSCALE)
