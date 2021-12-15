@@ -36,13 +36,13 @@ class EdgeDetector():
             for h in range(-half, half+1):
                 for w in range(-half, half+1):
                     if (i+h < 0 or i+h >= self.h) and (0 <= j+w < self.w):
-                        ret[h+half][w+half] = img[i][j+w]
+                        ret[h+half][w+half] = self.img[i][j+w]
                     elif (j+w < 0 or j+w >= self.w) and (0 <= i+h < self.h):
-                        ret[h+half][w+half] = img[i+h][j]
+                        ret[h+half][w+half] = self.img[i+h][j]
                     elif (0 <= j+w < self.w) and (0 <= i+h < self.h):
-                        ret[h+half][w+half] = img[i+h][j+w]
+                        ret[h+half][w+half] = self.img[i+h][j+w]
                     else:
-                        ret[h+half][w+half] = img[i][j]
+                        ret[h+half][w+half] = self.img[i][j]
             return ret
 
     def get_magnitude(self, i ,j):
