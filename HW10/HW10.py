@@ -9,51 +9,38 @@ class EdgeDetector():
     def __init__(self, img, mask):
         self.img = img
         self.h, self.w = self.img.shape
-        self.ret = np.zeros((img.shape), np.uint8)
+        # self.ret = np.full(img.shape, 255, dtype=int) 
+        self.ret = np.zeros((img.shape), dtype=int)
         self.mask = mask
 
     def zero_crossing_detector(self, threshold, alpha):
+        labels = np.zeros((img.shape), dtype=int)
         for i in range(self.h):
             for j in range(self.w):
-                self.ret[i][j] = 1 if self.conv(i, j, alpha) >= threshold else -1 if self.conv(i, j, alpha) <= -threshold else 0
-                # self.ret[i][j] = BLACK if self.conv(i, j, alpha) >= threshold else WHITE
+                labels[i][j] = self.conv(i, j, alpha, threshold)
 
-        kernel_size = len(self.mask)
-        half = kernel_size // 2
+        for i, l in enumerate(labels):
+            if i < 20:
+                print(l[0:20])
+        
+        raw_size = len(labels)
+        half = len(self.mask) // 2
 
         for x in range(self.h):
             for y in range(self.w):
-                if self.ret[i][j] == 1:
-                    for i in range(-half + 1, half + 1):
-                        for j in range(-half + 1, half + 1):
-                            if x + i >= 0 and x + i <= kernel_size
+                edge = WHITE
+                if labels[x][j] == 1:
+                    for i in range(-half, half + 1):
+                        for j in range(-half, half + 1):
+                            if x + i >= 0 and x + i < raw_size and y + j >= 0 and y + j < raw_size:
+                                # print("?")
+                                if labels[x+i][y+j] == -1:
+                                    edge = BLACK
+                
+                self.ret[x][y] = edge
 
-        # x = position[0]
-        # y = position[1]
-        # rawSize = len(labels)
-        # half = sizes[0]/2
-
-        # if labels[x][y] == 1:
-        #     for row in xrange(-half,  half+1):
-        #         for col in xrange(-half, half+1):
-        #             if x+col >= 0 and x+col <= rawSize-1 and y+row >= 0 and y+row <=rawSize-1:
-        #                 # print x+col, y+row
-        #                 if labels[x+col][y+row] == -1:
-        #                     return 0
-
-        # for ai in range(ra):
-        #     for aj in range(ca):
-        #         # check the sudden change of pixel magnitude for edge detection
-        #         edge = 255
-        #         if img_in[ai, aj] == 1:
-        #             for ki in range(-rk // 2 + 1, rk // 2 + 1):
-        #                 for kj in range(-ck // 2 + 1, ck // 2 + 1):
-        #                     if  ai + ki >= 0 and ai + ki < ra and aj + kj >= 0 and aj + kj < ca:
-        #                         if img_in[ai + ki, aj + kj] == -1:
-        #                             edge = 0
-        #         res[ai, aj] = edge
-
-        # return WHITE 
+        print(self.ret)
+        print('='*10)
         
         return self.ret
 
@@ -79,13 +66,19 @@ class EdgeDetector():
                         ret[h+half][w+half] = self.img[i][j]
             return ret
 
-    def conv(self, i, j, alpha):
+    def conv(self, i, j, alpha, threshold):
         temp_matrix = self.get_extend_matrix(i, j)
-        # temp = 0
+        temp = 0
         # temp += (temp_matrix * self.mask).sum()
-        temp = (temp_matrix * self.mask).sum()
+        # temp = (temp_matrix * self.mask).sum() * alpha
+        # temp *= alpha
+        for i in range(len(temp_matrix)):
+            for j in range(len(temp_matrix)):
+                temp += temp_matrix[i][j] * self.mask[len(temp_matrix)-i-1][len(temp_matrix)-j-1]
         temp *= alpha
-        return temp
+        # print(temp)
+        
+        return 1 if temp >= threshold else -1 if temp <= -threshold else 0
 
 if __name__ == "__main__":
     img = cv2.imread("./HW10/lena.bmp", cv2.IMREAD_GRAYSCALE)
@@ -99,6 +92,6 @@ if __name__ == "__main__":
     mask3 = np.array(
             [[2, -1, 2], [-1, -4, -1], [2, -1, 2]]
         )
-    cv2.imwrite("./HW10/laplacian1.bmp", EdgeDetector(img, mask1).zero_crossing_detector(15, 1))
-    cv2.imwrite("./HW10/laplacian2.bmp", EdgeDetector(img, mask2).zero_crossing_detector(15, 1/3))
-    cv2.imwrite("./HW10/laplacian3.bmp", EdgeDetector(img, mask3).zero_crossing_detector(20, 1/3))
+    cv2.imwrite("./HW10/laplacian1.bmp", EdgeDetector(img, mask1).zero_crossing_detector(15, 1.0))
+    # cv2.imwrite("./HW10/laplacian2.bmp", EdgeDetector(img, mask2).zero_crossing_detector(15, 1/3))
+    # cv2.imwrite("./HW10/laplacian3.bmp", EdgeDetector(img, mask3).zero_crossing_detector(20, 1/3))
