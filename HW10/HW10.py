@@ -5,12 +5,11 @@ import math
 BLACK = 0
 WHITE = 255
 
-class EdgeDetector():
+class Detector():
     def __init__(self, img, mask):
         self.img = img
         self.h, self.w = self.img.shape
-        # self.ret = np.full(img.shape, 255, dtype=int) 
-        self.ret = np.zeros((img.shape), dtype=int)
+        self.ret = np.full(img.shape, 255, dtype=int) 
         self.mask = mask
 
     def zero_crossing_detector(self, threshold, alpha):
@@ -18,29 +17,20 @@ class EdgeDetector():
         for i in range(self.h):
             for j in range(self.w):
                 labels[i][j] = self.conv(i, j, alpha, threshold)
-
-        for i, l in enumerate(labels):
-            if i < 20:
-                print(l[0:20])
         
-        raw_size = len(labels)
-        half = len(self.mask) // 2
+        half = 3 // 2
 
         for x in range(self.h):
             for y in range(self.w):
                 edge = WHITE
-                if labels[x][j] == 1:
+                if labels[x][y] == 1:
                     for i in range(-half, half + 1):
                         for j in range(-half, half + 1):
-                            if x + i >= 0 and x + i < raw_size and y + j >= 0 and y + j < raw_size:
-                                # print("?")
+                            if x + i >= 0 and x + i < self.h and y + j >= 0 and y + j < self.w:
                                 if labels[x+i][y+j] == -1:
                                     edge = BLACK
                 
                 self.ret[x][y] = edge
-
-        print(self.ret)
-        print('='*10)
         
         return self.ret
 
@@ -68,30 +58,58 @@ class EdgeDetector():
 
     def conv(self, i, j, alpha, threshold):
         temp_matrix = self.get_extend_matrix(i, j)
-        temp = 0
-        # temp += (temp_matrix * self.mask).sum()
-        # temp = (temp_matrix * self.mask).sum() * alpha
+        temp = (temp_matrix * self.mask).sum() * alpha
+        # for i in range(len(temp_matrix)):
+        #     for j in range(len(temp_matrix)):
+        #         temp += temp_matrix[i][j] * self.mask[len(temp_matrix)-i-1][len(temp_matrix)-j-1]
         # temp *= alpha
-        for i in range(len(temp_matrix)):
-            for j in range(len(temp_matrix)):
-                temp += temp_matrix[i][j] * self.mask[len(temp_matrix)-i-1][len(temp_matrix)-j-1]
-        temp *= alpha
-        # print(temp)
         
         return 1 if temp >= threshold else -1 if temp <= -threshold else 0
 
 if __name__ == "__main__":
     img = cv2.imread("./HW10/lena.bmp", cv2.IMREAD_GRAYSCALE)
 
-    mask1 = np.array(
+    mask = np.array(
             [[0, 1, 0], [1, -4, 1], [0, 1, 0]]
         )
-    mask2 = np.array(
+    cv2.imwrite("./HW10/laplacian1.bmp", Detector(img, mask).zero_crossing_detector(15, 1))
+    
+    mask = np.array(
             [[1, 1, 1], [1, -8, 1], [1, 1, 1]]
         )
-    mask3 = np.array(
+    cv2.imwrite("./HW10/laplacian2.bmp", Detector(img, mask).zero_crossing_detector(15, 1/3))
+
+    mask = np.array(
             [[2, -1, 2], [-1, -4, -1], [2, -1, 2]]
         )
-    cv2.imwrite("./HW10/laplacian1.bmp", EdgeDetector(img, mask1).zero_crossing_detector(15, 1.0))
-    # cv2.imwrite("./HW10/laplacian2.bmp", EdgeDetector(img, mask2).zero_crossing_detector(15, 1/3))
-    # cv2.imwrite("./HW10/laplacian3.bmp", EdgeDetector(img, mask3).zero_crossing_detector(20, 1/3))
+    cv2.imwrite("./HW10/minimum_laplacian.bmp", Detector(img, mask).zero_crossing_detector(20, 1/3))
+
+    mask = np.array([
+            [0, 0, 0, -1, -1, -2, -1, -1, 0, 0, 0],
+            [0, 0, -2, -4, -8, -9, -8, -4, -2, 0, 0],
+            [0, -2, -7, -15, -22, -23, -22, -15, -7, -2, 0],
+            [-1, -4, -15, -24, -14, -1, -14, -24, -15, -4, -1],
+            [-1, -8, -22, -14, 52, 103, 52, -14, -22, -8, -1],
+            [-2, -9, -23, -1, 103, 178, 103, -1, -23, -9, -2],
+            [-1, -8, -22, -14, 52, 103, 52, -14, -22, -8, -1],
+            [-1, -4, -15, -24, -14, -1, -14, -24, -15, -4, -1],
+            [0, -2, -7, -15, -22, -23, -22, -15, -7, -2, 0],
+            [0, 0, -2, -4, -8, -9, -8, -4, -2, 0, 0],
+            [0, 0, 0, -1, -1, -2, -1, -1, 0, 0, 0]
+        ])
+    cv2.imwrite("./HW10/laplacian_gaussian.bmp", Detector(img, mask).zero_crossing_detector(3000, 1))
+
+    mask = np.array([
+            [-1, -3, -4, -6, -7, -8, -7, -6, -4, -3, -1],
+            [-3, -5, -8, -11, -13, -13, -13, -11, -8, -5, -3],
+            [-4, -8, -12, -16, -17, -17, -17, -16, -12, -8, -4],
+            [-6, -11, -16, -16, 0, 15, 0, -16, -16, -11, -6],
+            [-7, -13, -17, 0, 85, 160, 85, 0, -17, -13, -7],
+            [-8, -13, -17, 15, 160, 283, 160, 15, -17, -13, -8],
+            [-7, -13, -17, 0, 85, 160, 85, 0, -17, -13, -7],
+            [-6, -11, -16, -16, 0, 15, 0, -16, -16, -11, -6],
+            [-4, -8, -12, -16, -17, -17, -17, -16, -12, -8, -4],
+            [-3, -5, -8, -11, -13, -13, -13, -11, -8, -5, -3],
+            [-1, -3, -4, -6, -7, -8, -7, -6, -4, -3, -1],
+        ])
+    cv2.imwrite("./HW10/difference_gaussian.bmp", Detector(img, mask).zero_crossing_detector(1, 1))
