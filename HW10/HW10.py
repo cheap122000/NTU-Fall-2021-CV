@@ -37,8 +37,12 @@ class Detector():
     def get_extend_matrix(self, i, j):
         if self.mask.shape[0] == 2:
             ret = np.array([
-                [self.img[i][j], self.img[i][j+1] if j+1 < self.w else self.img[i][j]], 
-                [self.img[i+1][j] if i+1 < self.h else self.img[i][j], self.img[i+1][j+1] if i+1 < self.h and j+1 < self.w else self.img[i][j] if i+1 >= self.h and j+1 >= self.w else self.img[i+1][j] if i+1 < self.h and j+1 >= self.w else self.img[i][j+1]]
+                [self.img[i][j], self.img[i][j+1] if j+1 < self.w \
+                    else self.img[i][j]], [self.img[i+1][j] if i+1 < self.h \
+                    else self.img[i][j], self.img[i+1][j+1] if i+1 < self.h and j+1 < self.w \
+                    else self.img[i][j] if i+1 >= self.h and j+1 >= self.w \
+                    else self.img[i+1][j] if i+1 < self.h and j+1 >= self.w \
+                    else self.img[i][j+1]]
             ])
             return ret
         else:
@@ -58,11 +62,12 @@ class Detector():
 
     def conv(self, i, j, alpha, threshold):
         temp_matrix = self.get_extend_matrix(i, j)
-        temp = (temp_matrix * self.mask).sum() * alpha
-        # for i in range(len(temp_matrix)):
-        #     for j in range(len(temp_matrix)):
-        #         temp += temp_matrix[i][j] * self.mask[len(temp_matrix)-i-1][len(temp_matrix)-j-1]
-        # temp *= alpha
+        # temp = (temp_matrix * self.mask).sum() * alpha
+        temp = 0
+        for i in range(len(temp_matrix)):
+            for j in range(len(temp_matrix)):
+                temp += temp_matrix[i][j] * self.mask[len(temp_matrix)-i-1][len(temp_matrix)-j-1]
+        temp *= alpha
         
         return 1 if temp >= threshold else -1 if temp <= -threshold else 0
 
